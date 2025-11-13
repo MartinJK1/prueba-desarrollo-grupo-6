@@ -34,7 +34,7 @@ const whitelist = [
   'http://localhost:3000',
   process.env.FRONTEND_URL,
   process.env.VITE_API_BASE_URL
-];
+].filter(Boolean); // Elimina valores undefined/null
 
 // Configuración de CORS
 const corsOptions = {
@@ -42,11 +42,17 @@ const corsOptions = {
     // Permite peticiones sin origen (como las de Postman o apps móviles)
     if (!origin) return callback(null, true);
     
+    // Permite dominios de Vercel (cualquier subdominio de vercel.app)
+    if (origin.includes('.vercel.app') || origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    
     if (whitelist.indexOf(origin) !== -1) {
       // Si el origen está en la lista blanca, permitir la petición
       callback(null, true);
     } else {
       // Si no, rechazarla
+      console.warn(`⚠️  CORS bloqueado para origen: ${origin}`);
       callback(new Error('No permitido por CORS'));
     }
   },
@@ -87,6 +93,23 @@ console.log(' Ruta /api/admin registrada');
 app.get('/', (req, res) => {
   res.json({
     message: 'API del Lubricentro Renault funcionando!',
+    endpoints: {
+      auth: '/api/auth',
+      users: '/api/users',
+      vehicles: '/api/vehicles',
+      reservations: '/api/reservations',
+      services: '/api/services',
+      serviceHistory: '/api/services/history',
+      admin: '/api/admin'
+    }
+  });
+});
+
+// Ruta /api para evitar 404
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'API del Lubricentro Renault',
+    version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
       users: '/api/users',
