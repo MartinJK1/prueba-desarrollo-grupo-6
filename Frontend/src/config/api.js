@@ -1,6 +1,8 @@
 // Configuración de APIs para el proyecto
 const API_CONFIG = {
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL 
+    ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api` 
+    : 'http://localhost:3000/api',
   timeout: 8000 // Timeout general
 };
 
